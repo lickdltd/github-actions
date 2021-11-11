@@ -1,0 +1,42 @@
+name: Deploy
+on:
+  workflow_call:
+    inputs:
+      docker-compose-file:
+        type: string
+        required: true
+        default: ./docker-compose.ansible.yaml
+      ansible-env:
+        type: string
+        required: true
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    env:
+      ANSIBLE_ENV: ${{ inputs.ansible-env }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Login to GitHub Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_PAT }}
+      - name: Setup SSH key
+        run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ./id_rsa
+      - name: Setup SSH known hosts
+        run: ssh-keyscan github.com > ./known_hosts
+      - name: Setup SSH permissions
+        run: chmod 600 ./id_rsa ./known_hosts
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+      - name: Install ansible requirements
+        run: docker-compose -f ${{ inputs.docker-compose-file }} run ansible ansible-galaxy install -r requirements.yaml
+      - name: Deploy using anisble
+        run: docker-compose -f ${{ inputs.docker-compose-file }} run ansible ansible-playbook deploy.yaml

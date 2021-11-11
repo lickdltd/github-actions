@@ -20,7 +20,7 @@ jobs:
       run:
         working-directory: ${{ inputs.terraform-working-directory }}
     env:
-      TF_VAR_docker_tag: ${{ input.terraform-var-docker-tag }}
+      TF_VAR_docker_tag: ${{ inputs.terraform-var-docker-tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2

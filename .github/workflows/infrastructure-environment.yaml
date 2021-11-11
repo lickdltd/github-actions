@@ -4,9 +4,12 @@ on:
     inputs:
       terraform-working-directory:
         type: string
-        required: true
+        required: false
         default: ./infrastructure/terraform/environment
       terraform-workspace:
+        type: string
+        required: true
+      terraform-var-docker-tag:
         type: string
         required: true
 jobs:
@@ -16,6 +19,8 @@ jobs:
     defaults:
       run:
         working-directory: ${{ inputs.terraform-working-directory }}
+    env:
+      TF_VAR_docker_tag: ${{ input.terraform-var-docker-tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2

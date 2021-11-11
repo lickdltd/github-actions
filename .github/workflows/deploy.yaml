@@ -4,7 +4,7 @@ on:
     inputs:
       docker-compose-file:
         type: string
-        required: true
+        required: false
         default: ./docker-compose.ansible.yaml
       ansible-env:
         type: string

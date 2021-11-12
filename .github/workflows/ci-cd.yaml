@@ -29,6 +29,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_COMPOSE_FILE: ./docker-compose.build.yaml
+      DOCKER_IMAGE_URL: ${{ inputs.docker-image-url }}
+      DOCKER_TAG: ${{ inputs.docker-tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -76,9 +78,9 @@ jobs:
           aws-region: eu-west-1
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
-      - name: Fmt
+      - name: Format
         run: terraform fmt -no-color -diff -check
-      - name: Init
+      - name: Initialise
         env:
           GIT_SSH_COMMAND: 'ssh -i ./id_rsa -o UserKnownHostsFile=./known_hosts'
         run: terraform init -no-color -upgrade
@@ -95,6 +97,8 @@ jobs:
     defaults:
       run:
         working-directory: ./infrastructure/terraform/environment
+    env:
+      TF_VAR_docker_tag: ${{ inputs.docker-tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -112,9 +116,9 @@ jobs:
           aws-region: eu-west-1
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
-      - name: Fmt
+      - name: Format
         run: terraform fmt -no-color -diff -check
-      - name: Init
+      - name: Initialise
         env:
           GIT_SSH_COMMAND: 'ssh -i ./id_rsa -o UserKnownHostsFile=./known_hosts'
         run: terraform init -no-color -upgrade
@@ -135,6 +139,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_COMPOSE_FILE: ./docker-compose.ansible.yaml
+      ANSIBLE_ENV: ${{ inputs.environment }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2

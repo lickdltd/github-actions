@@ -58,6 +58,7 @@ jobs:
   infrastructure-shared:
     name: Infrastructure (shared)
     runs-on: ubuntu-latest
+    needs: build
     defaults:
       run:
         working-directory: ./infrastructure/terraform/shared
@@ -94,6 +95,7 @@ jobs:
   infrastructure-environment:
     name: Infrastructure (environment)
     runs-on: ubuntu-latest
+    needs: infrastructure-shared
     defaults:
       run:
         working-directory: ./infrastructure/terraform/environment
@@ -123,10 +125,10 @@ jobs:
           GIT_SSH_COMMAND: 'ssh -i ./id_rsa -o UserKnownHostsFile=./known_hosts'
         run: terraform init -no-color -upgrade
       - name: Create workspace
-        run: terraform workspace new ${{ inputs.terraform-workspace }} -no-color
+        run: terraform workspace new ${{ inputs.environment }} -no-color
         continue-on-error: true
       - name: Select workspace
-        run: terraform workspace select ${{ inputs.terraform-workspace }} -no-color
+        run: terraform workspace select ${{ inputs.environment }} -no-color
       - name: Validate
         run: terraform validate -no-color
       - name: Plan
@@ -137,6 +139,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
+    needs: infrastructure-environment
     env:
       DOCKER_COMPOSE_FILE: ./docker-compose.ansible.yaml
       ANSIBLE_ENV: ${{ inputs.environment }}

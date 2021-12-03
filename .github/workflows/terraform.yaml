@@ -37,8 +37,10 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
       - name: Format
+        id: fmt
         run: terraform fmt -check
       - name: Initialise
+        id: init
         env:
           GIT_SSH_COMMAND: 'ssh -i ./id_rsa -o UserKnownHostsFile=./known_hosts'
         run: terraform init -upgrade
@@ -46,11 +48,13 @@ jobs:
         if: inputs.workspace!= 'default'
         run: terraform workspace select ${{ inputs.workspace }} -no-color
       - name: Validate
+        id: validate
         run: terraform validate -no-color
       - name: Refresh
         if: github.ref == 'refs/heads/main'
         run: terraform apply -no-color -compact-warnings -auto-approve -refresh-only
       - name: Plan
+        id: plan
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color -compact-warnings
         continue-on-error: true
@@ -62,21 +66,21 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `### ${{ inputs.working-directory }} (${{ inputs.workspace }})
-            #### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            const output = `*${{ inputs.working-directory }} (${{ inputs.workspace }})*
+            🖌 Terraform Format and Style `${{ steps.fmt.outcome }}`
+            ⚙ Terraform Initialization ️`${{ steps.init.outcome }}`
+            📖 Terraform Plan `${{ steps.plan.outcome }}`
+            🤖 Terraform Validation `${{ steps.validate.outcome }}`
 
             <details><summary>Show Plan</summary>
 
-            \`\`\`\n
+            ```\n
             ${process.env.PLAN}
-            \`\`\`
+            ```
 
             </details>
 
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+            *Pusher: `${{ github.actor }}`, Action: `${{ github.event_name }}`*`;
 
             github.issues.createComment({
               issue_number: context.issue.number,

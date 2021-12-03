@@ -59,30 +59,27 @@ jobs:
         run: terraform plan -no-color -compact-warnings
         continue-on-error: true
       - name: Update pull request
-        uses: actions/github-script@0.9.0
+        uses: actions/github-script@v5
         if: github.event_name == 'pull_request'
-        env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `*${{ inputs.working-directory }} (${{ inputs.workspace }})*
+            const output = `**${{ inputs.working-directory }} (${{ inputs.workspace }})**
             🖌 Terraform Format and Style \`${{ steps.fmt.outcome }}\`
             ⚙ Terraform Initialization ️\`${{ steps.init.outcome }}\`
-            📖 Terraform Plan \`${{ steps.plan.outcome }}\`
             🤖 Terraform Validation \`${{ steps.validate.outcome }}\`
+            📖 Terraform Plan \`${{ steps.plan.outcome }}\`
 
             <details><summary>Show Plan</summary>
 
             \`\`\`\n
-            ${process.env.PLAN}
+            ${{ steps.plan.outputs.stdout }}
             \`\`\`
 
             </details>
 
             *Pusher: \`${{ github.actor }}\`, Action: \`${{ github.event_name }}\`*`;
 
-            github.issues.createComment({
+            github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,

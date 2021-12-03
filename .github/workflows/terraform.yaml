@@ -15,9 +15,6 @@ on:
         type: string
         required: false
         default: default
-    secrets:
-      github-token:
-        required: true
 jobs:
   terraform:
     name: Terraform
@@ -63,7 +60,7 @@ jobs:
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
-          github-token: ${{ secrets.github-token }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const output = `### ${{ inputs.working-directory }} (${{ inputs.workspace }})
             #### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`

@@ -8,6 +8,10 @@ on:
       aws-account-id:
         type: string
         required: true
+      terraform-version:
+        type: string
+        required: false
+        default: '1.0.0'
       working-directory:
         type: string
         required: true
@@ -36,6 +40,8 @@ jobs:
           role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/GitHub
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: ${{ inputs.terraform-version }}
       - name: Format
         id: fmt
         run: terraform fmt -check

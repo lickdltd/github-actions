@@ -1,0 +1,65 @@
+name: Ansible
+on:
+  workflow_call:
+    inputs:
+      aws-region:
+        type: string
+        required: true
+      aws-account-id:
+        type: string
+        required: true
+      container-image-name:
+        type: string
+        required: false
+        default: ansible
+      container-image-version:
+        type: string
+        required: false
+        default: latest
+      working-directory:
+        type: string
+        required: true
+      install:
+        type: boolean
+        required: false
+        default: true
+      playbook:
+        type: string
+        required: true
+    secrets:
+      gh-pat:
+        required: true
+      ssh-private-key:
+        required: true
+jobs:
+  ansible:
+    name: Ansible
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    container:
+      image: ghcr.io/${{ github.repository_owner }}/${{ inputs.container-image-name }}:${{ inputs.container-image-version }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.gh-pat }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ inputs.aws-region }}
+          role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/GitHub
+      - name: Setup SSH key
+        run: echo "${{ secrets.ssh-private-key }}" > /root/.ssh/id_rsa
+      - name: Setup SSH permissions
+        run: chmod 600 /root/.ssh/id_rsa
+      - name: Install
+        if: inputs.install == true
+        run: ansible-galaxy install -r requirements.yaml
+      - name: Run playbook
+        run: ansible-playbook ${{ inputs.playbook }}

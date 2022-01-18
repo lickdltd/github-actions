@@ -25,6 +25,9 @@ on:
       unit-test-cmd:
         type: string
         required: false
+      behaviour-test-cmd:
+        type: string
+        required: false
     secrets:
       gh-pat:
         required: true
@@ -52,6 +55,16 @@ jobs:
         with:
           aws-region: ${{ inputs.aws-region }}
           role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/GitHub
+      - name: Create AWS directory
+        run: mkdir -p ~/.aws
+      - name: Create AWS profile
+        run: echo "[default]" > ~/.aws/credentials
+      - name: Store AWS access key ID
+        run: echo "aws_access_key_id = ${{ env.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
+      - name: Store AWS access key secret
+        run: echo "aws_secret_access_key = ${{ env.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+      - name: Store AWS session token
+        run: echo "aws_session_token = ${{ env.AWS_SESSION_TOKEN }}" >> ~/.aws/credentials
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
       - name: Build
@@ -59,6 +72,9 @@ jobs:
       - name: Tests (unit)
         if: inputs.unit-test-cmd != ''
         run: ${{ inputs.unit-test-cmd }}
+      - name: Tests (behaviour)
+        if: inputs.behaviour-test-cmd != ''
+        run: ${{ inputs.behaviour-test-cmd }}
       - name: Push
         if: inputs.docker-push == true
         run: docker-compose -f ${{ inputs.docker-compose-file }} push

@@ -48,7 +48,7 @@ jobs:
       - name: Build
         run: docker-compose -f ${{ inputs.docker-compose-file }} build --force-rm --no-cache --pull
       - name: Test
-        run: make test
+        run: echo test
       - name: Push
         if: inputs.docker-push == true
         run: docker-compose -f ${{ inputs.docker-compose-file }} push

@@ -30,6 +30,10 @@ on:
       playbook:
         type: string
         required: true
+      variables:
+        type: string
+        required: false
+        default: '{}'
     secrets:
       gh-pat:
         required: true
@@ -67,5 +71,8 @@ jobs:
       - name: Install
         if: inputs.install == true
         run: ansible-galaxy install -r requirements.yaml
+      - name: Variables
+        if: inputs.variables != ''
+        run: echo "${{ toJSON(inputs.variables) }}" > ./@variables.json
       - name: Run playbook
-        run: ansible-playbook ${{ inputs.playbook }}
+        run: ansible-playbook ${{ inputs.playbook }} --extra-vars "./@variables.json"

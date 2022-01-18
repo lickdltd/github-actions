@@ -8,13 +8,17 @@ on:
       aws-account-id:
         type: string
         required: true
+      working-directory:
+        type: string
+        required: true
+      ssh:
+        type: boolean
+        required: false
+        default: false
       terraform-version:
         type: string
         required: false
         default: '1.0.0'
-      working-directory:
-        type: string
-        required: true
       workspace:
         type: string
         required: false
@@ -42,10 +46,10 @@ jobs:
           aws-region: ${{ inputs.aws-region }}
           role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/GitHub
       - name: Setup SSH key
-        if: ${{ secrets.ssh-private-key }} != ''
+        if: inputs.ssh == true
         run: echo "${{ secrets.ssh-private-key }}" > /root/.ssh/id_rsa
       - name: Setup SSH permissions
-        if: ${{ secrets.ssh-private-key }} != ''
+        if: inputs.ssh == true
         run: chmod 600 /root/.ssh/id_rsa
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1

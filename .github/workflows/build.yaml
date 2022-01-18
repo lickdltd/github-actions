@@ -12,6 +12,12 @@ on:
         type: string
         required: false
         default: docker-compose.yaml
+      docker-image-url:
+        type: string
+        required: true
+      docker-tag:
+        type: string
+        required: true
       docker-push:
         type: boolean
         required: false

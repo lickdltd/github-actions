@@ -23,6 +23,9 @@ on:
         type: string
         required: false
         default: default
+      variables:
+        type: string
+        required: false
     secrets:
       ssh-private-key:
         required: false
@@ -72,6 +75,9 @@ jobs:
       - name: Refresh
         if: github.ref == 'refs/heads/main'
         run: terraform apply -no-color -compact-warnings -auto-approve -refresh-only
+      - name: Variables
+        if: inputs.variables != ''
+        run: echo "${{ fromJSON(inputs.variables) }}" > ./terraform.tfvars.json
       - name: Plan
         id: plan
         if: github.event_name == 'pull_request'

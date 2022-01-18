@@ -19,6 +19,9 @@ on:
         type: string
         required: false
         default: default
+    secrets:
+      ssh-private-key:
+        required: false
 jobs:
   terraform:
     name: Terraform
@@ -38,6 +41,12 @@ jobs:
         with:
           aws-region: ${{ inputs.aws-region }}
           role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/GitHub
+      - name: Setup SSH key
+        if: secrets.ssh-private-key != ''
+        run: echo "${{ secrets.ssh-private-key }}" > /root/.ssh/id_rsa
+      - name: Setup SSH permissions
+        if: secrets.ssh-private-key != ''
+        run: chmod 600 /root/.ssh/id_rsa
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:

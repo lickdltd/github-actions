@@ -30,7 +30,7 @@ on:
       gh-pat:
         required: true
       ssh-private-key:
-        required: true
+        required: false
 jobs:
   ansible:
     name: Ansible
@@ -55,8 +55,10 @@ jobs:
           aws-region: ${{ inputs.aws-region }}
           role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/GitHub
       - name: Setup SSH key
+        if: secrets.ssh-private-key != ''
         run: echo "${{ secrets.ssh-private-key }}" > /root/.ssh/id_rsa
       - name: Setup SSH permissions
+        if: secrets.ssh-private-key != ''
         run: chmod 600 /root/.ssh/id_rsa
       - name: Install
         if: inputs.install == true

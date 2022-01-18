@@ -47,10 +47,10 @@ jobs:
           role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/GitHub
       - name: Setup SSH key
         if: inputs.ssh == true
-        run: echo "${{ secrets.ssh-private-key }}" > /root/.ssh/id_rsa
+        run: echo "${{ secrets.ssh-private-key }}" > ./id_rsa
       - name: Setup SSH permissions
         if: inputs.ssh == true
-        run: chmod 600 /root/.ssh/id_rsa
+        run: chmod 600 ./id_rsa
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:

@@ -75,7 +75,7 @@ jobs:
       - name: Plan
         id: plan
         if: github.event_name == 'pull_request'
-        run: terraform plan -no-color -compact-warnings
+        run: terraform plan -no-color -compact-warnings -input=false
         continue-on-error: true
       - name: Update pull request
         uses: actions/github-script@v5
@@ -109,4 +109,4 @@ jobs:
         run: exit 1
       - name: Apply
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'schedule')
-        run: terraform apply -compact-warnings -auto-approve
+        run: terraform apply -compact-warnings -auto-approve -input=false

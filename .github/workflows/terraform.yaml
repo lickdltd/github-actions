@@ -11,10 +11,6 @@ on:
       working-directory:
         type: string
         required: true
-      ssh:
-        type: boolean
-        required: false
-        default: false
       terraform-version:
         type: string
         required: false
@@ -36,7 +32,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-      pull-requests: write
     defaults:
       run:
         working-directory: ${{ inputs.working-directory }}

@@ -19,10 +19,6 @@ on:
       working-directory:
         type: string
         required: true
-      ssh:
-        type: boolean
-        required: false
-        default: false
       install:
         type: boolean
         required: false
@@ -35,7 +31,7 @@ on:
         required: false
         default: '{}'
     secrets:
-      gh-pat:
+      ghcr-pat:
         required: true
       ssh-private-key:
         required: false
@@ -50,24 +46,20 @@ jobs:
       image: ghcr.io/${{ github.repository_owner }}/${{ inputs.container-image-name }}:${{ inputs.container-image-version }}
       credentials:
         username: ${{ github.actor }}
-        password: ${{ secrets.gh-pat }}
+        password: ${{ secrets.ghcr-pat }}
     defaults:
       run:
         working-directory: ${{ inputs.working-directory }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Setup
+        id: setup
+        uses: lickdltd/setup-action@main
         with:
           aws-region: ${{ inputs.aws-region }}
-          role-to-assume: arn:aws:iam::${{ inputs.aws-account-id }}:role/GitHub
-      - name: Setup SSH key
-        if: inputs.ssh == true
-        run: echo "${{ secrets.ssh-private-key }}" > /root/.ssh/id_rsa
-      - name: Setup SSH permissions
-        if: inputs.ssh == true
-        run: chmod 600 /root/.ssh/id_rsa
+          aws-account-id: ${{ inputs.aws-account-id }}
+          ssh-private-key: ${{ secrets.ssh-private-key }}
       - name: Install
         if: inputs.install == true
         run: ansible-galaxy install -r requirements.yaml

@@ -19,9 +19,6 @@ on:
         type: string
         required: false
         default: default
-      variables:
-        type: string
-        required: false
     secrets:
       ssh-private-key:
         required: false
@@ -69,13 +66,13 @@ jobs:
       - name: Refresh
         if: github.ref == 'refs/heads/main'
         run: terraform apply -no-color -compact-warnings -auto-approve -refresh-only
-      - name: Variables
-        if: inputs.variables != ''
-        run: echo "${{ toJSON(inputs.variables) }}" > ./terraform.tfvars.json
       - name: Plan
-        id: plan
         if: github.event_name == 'pull_request'
+        env:
+          TF_VAR_docker_tag: ${{ steps.setup.outputs.git-hash-short }}
         run: terraform plan -no-color -compact-warnings -input=false
       - name: Apply
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'schedule')
+        env:
+          TF_VAR_docker_tag: ${{ steps.setup.outputs.git-hash-short }}
         run: terraform apply -compact-warnings -auto-approve -input=false

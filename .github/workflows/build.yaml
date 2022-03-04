@@ -15,9 +15,6 @@ on:
       docker-image-url:
         type: string
         required: true
-      docker-tag:
-        type: string
-        required: true
       docker-push:
         type: boolean
         required: false
@@ -40,7 +37,6 @@ jobs:
       contents: read
     env:
       DOCKER_IMAGE_URL: ${{ inputs.docker-image-url }}
-      DOCKER_TAG: ${{ inputs.docker-tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -52,13 +48,21 @@ jobs:
           aws-region: ${{ inputs.aws-region }}
           aws-account-id: ${{ inputs.aws-account-id }}
       - name: Build
+        env:
+          DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
         run: docker-compose -f ${{ inputs.docker-compose-file }} build
       - name: Tests (unit)
         if: inputs.unit-test-cmd != ''
+        env:
+          DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
         run: ${{ inputs.unit-test-cmd }}
       - name: Tests (behaviour)
         if: inputs.behaviour-test-cmd != ''
+        env:
+          DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
         run: ${{ inputs.behaviour-test-cmd }}
       - name: Push
         if: inputs.docker-push == true
+        env:
+          DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
         run: docker-compose -f ${{ inputs.docker-compose-file }} push

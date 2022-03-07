@@ -57,8 +57,10 @@ jobs:
         id: setup
         uses: lickdltd/setup-action@v1
         with:
+          aws-directory: /root/.aws
           aws-region: ${{ inputs.aws-region }}
           aws-account-id: ${{ inputs.aws-account-id }}
+          ssh-directory: /root/.ssh
           ssh-private-key: ${{ secrets.ssh-private-key }}
       - name: Install
         if: inputs.install == true

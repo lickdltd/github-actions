@@ -60,6 +60,7 @@ jobs:
           aws-directory: /root/.aws
           aws-region: ${{ inputs.aws-region }}
           aws-account-id: ${{ inputs.aws-account-id }}
+          aws-ecr: false
           ssh-directory: /root/.ssh
           ssh-private-key: ${{ secrets.ssh-private-key }}
       - name: Install

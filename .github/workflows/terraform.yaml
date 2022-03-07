@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Setup
         id: setup
-        uses: lickdltd/setup-action@main
+        uses: lickdltd/setup-action@v1
         with:
           aws-region: ${{ inputs.aws-region }}
           aws-account-id: ${{ inputs.aws-account-id }}

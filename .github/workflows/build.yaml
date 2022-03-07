@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Setup
         id: setup
-        uses: lickdltd/setup-action@main
+        uses: lickdltd/setup-action@v1
         with:
           ghcr-pat: ${{ secrets.ghcr-pat }}
           aws-region: ${{ inputs.aws-region }}

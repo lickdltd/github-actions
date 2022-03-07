@@ -19,6 +19,23 @@ on:
         type: boolean
         required: false
         default: false
+      kms-image-name:
+        type: string
+        required: false
+        default: kms
+      kms-image-version:
+        type: string
+        required: false
+        default: latest
+      kms-key-name:
+        type: string
+        required: false
+      kms-encrypted-dir:
+        type: string
+        required: false
+      kms-decrypted-dir:
+        type: string
+        required: false
       unit-test-cmd:
         type: string
         required: false
@@ -51,6 +68,17 @@ jobs:
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
         run: docker-compose -f ${{ inputs.docker-compose-file }} build
+      - name: Decrypt environment variables
+        if: inputs.kms-key-name != '' && inputs.kms-encrypted-dir != '' && inputs.kms-decrypted-dir != ''
+        run: |
+          docker run --rm \
+          -v ~/.aws:/root/.aws:ro \
+          -v ${{ inputs.kms-encrypted-dir }}:/tmp/encrypted \
+          -v ${{ inputs.kms-decrypted-dir }}:/tmp/decrypted \
+          ghcr.io/${{ github.repository_owner }}/${{ inputs.kms-image-name }}:${{ inputs.kms-image-version }} decrypt \
+            --key ${{ inputs.kms-key-name }} \
+            --input-dir /tmp/encrypted \
+            --output-dir /tmp/decrypted
       - name: Tests (unit)
         if: inputs.unit-test-cmd != ''
         env:

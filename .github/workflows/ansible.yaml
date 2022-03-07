@@ -57,7 +57,6 @@ jobs:
         id: setup
         uses: lickdltd/setup-action@v1
         with:
-          shell: sh
           aws-directory: /root/.aws
           aws-region: ${{ inputs.aws-region }}
           aws-account-id: ${{ inputs.aws-account-id }}

@@ -74,7 +74,9 @@ jobs:
         run: terraform validate -no-color
       - name: Refresh
         if: inputs.refresh == true
-        run: terraform apply -no-color -compact-warnings -auto-approve -refresh-only
+        env:
+          TF_VAR_docker_tag: ${{ steps.setup.outputs.git-hash-short }}
+        run: terraform apply -no-color -compact-warnings -auto-approve -input=false -refresh-only
       - name: Plan
         if: inputs.apply == false
         env:

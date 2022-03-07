@@ -19,6 +19,14 @@ on:
         type: string
         required: false
         default: default
+      refresh:
+        type: boolean
+        required: false
+        default: false
+      apply:
+        type: boolean
+        required: false
+        default: false
     secrets:
       ssh-private-key:
         required: false
@@ -55,25 +63,25 @@ jobs:
           GIT_SSH_COMMAND: 'ssh -i ~/.ssh/id_rsa -o UserKnownHostsFile=~/.ssh/known_hosts'
         run: terraform init -upgrade
       - name: Create workspace
-        if: inputs.workspace!= 'default'
+        if: inputs.workspace != 'default'
         run: terraform workspace new ${{ inputs.workspace }} -no-color
         continue-on-error: true
       - name: Select workspace
-        if: inputs.workspace!= 'default'
+        if: inputs.workspace != 'default'
         run: terraform workspace select ${{ inputs.workspace }} -no-color
       - name: Validate
         id: validate
         run: terraform validate -no-color
       - name: Refresh
-        if: github.ref == 'refs/heads/main'
+        if: inputs.refresh == true
         run: terraform apply -no-color -compact-warnings -auto-approve -refresh-only
       - name: Plan
-        if: github.event_name == 'pull_request'
+        if: inputs.apply == false
         env:
           TF_VAR_docker_tag: ${{ steps.setup.outputs.git-hash-short }}
         run: terraform plan -no-color -compact-warnings -input=false
       - name: Apply
-        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'schedule')
+        if: inputs.apply == true
         env:
           TF_VAR_docker_tag: ${{ steps.setup.outputs.git-hash-short }}
         run: terraform apply -compact-warnings -auto-approve -input=false

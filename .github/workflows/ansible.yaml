@@ -67,6 +67,6 @@ jobs:
         if: inputs.install == true
         run: ansible-galaxy install -r requirements.yaml
       - name: Variables
-        run: echo "${{ toJSON(inputs.variables) }}" > ./@variables.json
+        run: echo "${{ toJSON(inputs.variables) }}" > ./variables.json
       - name: Run playbook
-        run: ansible-playbook ${{ inputs.playbook }} --extra-vars "./@variables.json"
+        run: ansible-playbook ${{ inputs.playbook }} --extra-vars "@./variables.json"

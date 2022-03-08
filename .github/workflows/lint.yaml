@@ -1,0 +1,25 @@
+name: Build
+on:
+  workflow_call:
+    inputs:
+      default-branch:
+        type: string
+        required: false
+        default: main
+      validate-all:
+        type: boolean
+        required: false
+        default: false
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Lint
+        uses: github/super-linter@v4
+        env:
+          DEFAULT_BRANCH: ${{ inputs.default-branch }}
+          VALIDATE_ALL_CODEBASE: ${{ inputs.validate-all }}
+          IGNORE_GITIGNORED_FILES: true

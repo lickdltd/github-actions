@@ -10,6 +10,9 @@ on:
         type: boolean
         required: false
         default: false
+    secrets:
+      github-token:
+        required: true
 jobs:
   lint:
     name: Lint
@@ -20,6 +23,7 @@ jobs:
       - name: Lint
         uses: github/super-linter@v4
         env:
+          GITHUB_TOKEN: ${{ secrets.github-token }}
           DEFAULT_BRANCH: ${{ inputs.default-branch }}
           VALIDATE_ALL_CODEBASE: ${{ inputs.validate-all }}
           IGNORE_GITIGNORED_FILES: true

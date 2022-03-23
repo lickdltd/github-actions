@@ -51,6 +51,7 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         with:
           branch: terraform-upgrade
-          commit-message: [ automated ] Upgrade Terraform dependencies
-          title: Upgrade Terraform dependencies
-          body: Automated Terraform dependency upgrades
+          branch-suffix: random
+          commit-message: [ automated ] Upgrade Terraform dependencies (${{ inputs.working-directory }})
+          title: Upgrade Terraform dependencies for ${{ inputs.working-directory }}
+          body: Automated Terraform dependency upgrades for ${{ inputs.working-directory }}

@@ -52,6 +52,6 @@ jobs:
         with:
           branch: terraform-upgrade
           branch-suffix: random
-          commit-message: [ automated ] Upgrade Terraform dependencies (${{ inputs.working-directory }})
+          commit-message: Upgrade Terraform dependencies (${{ inputs.working-directory }})
           title: Upgrade Terraform dependencies for ${{ inputs.working-directory }}
           body: Automated Terraform dependency upgrades for ${{ inputs.working-directory }}

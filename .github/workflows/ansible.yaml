@@ -2,6 +2,9 @@ name: Ansible
 on:
   workflow_call:
     inputs:
+      environment:
+        type: string
+        required: true
       aws-region:
         type: string
         required: true
@@ -39,6 +42,8 @@ jobs:
   ansible:
     name: Ansible
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
     permissions:
       id-token: write
       contents: read

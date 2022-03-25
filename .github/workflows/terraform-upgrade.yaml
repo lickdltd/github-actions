@@ -22,10 +22,6 @@ jobs:
   terraform:
     name: Terraform Upgrade
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-      pull-requests: write
     defaults:
       run:
         working-directory: ${{ inputs.working-directory }}

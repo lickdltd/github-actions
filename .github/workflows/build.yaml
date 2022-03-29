@@ -8,6 +8,19 @@ on:
       aws-account-id:
         type: string
         required: true
+      kms-image-version:
+        type: string
+        required: false
+        default: latest
+      kms-key-name:
+        type: string
+        required: false
+      kms-encrypted-dir:
+        type: string
+        required: false
+      kms-decrypted-dir:
+        type: string
+        required: false
       docker-compose-file:
         type: string
         required: false
@@ -23,19 +36,6 @@ on:
         type: string
         required: false
         default: kms
-      kms-image-version:
-        type: string
-        required: false
-        default: latest
-      kms-key-name:
-        type: string
-        required: false
-      kms-encrypted-dir:
-        type: string
-        required: false
-      kms-decrypted-dir:
-        type: string
-        required: false
       unit-test-cmd:
         type: string
         required: false
@@ -64,10 +64,6 @@ jobs:
           ghcr-pat: ${{ secrets.ghcr-pat }}
           aws-region: ${{ inputs.aws-region }}
           aws-account-id: ${{ inputs.aws-account-id }}
-      - name: Build
-        env:
-          DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
-        run: docker-compose -f ${{ inputs.docker-compose-file }} build
       - name: Decrypt environment variables
         if: inputs.kms-key-name != '' && inputs.kms-encrypted-dir != '' && inputs.kms-decrypted-dir != ''
         run: |
@@ -79,6 +75,10 @@ jobs:
             --key ${{ inputs.kms-key-name }} \
             --input-dir /tmp/encrypted \
             --output-dir /tmp/decrypted
+      - name: Build
+        env:
+          DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
+        run: docker-compose -f ${{ inputs.docker-compose-file }} build
       - name: Tests (unit)
         if: inputs.unit-test-cmd != ''
         env:

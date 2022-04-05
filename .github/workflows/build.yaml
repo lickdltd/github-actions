@@ -107,4 +107,4 @@ jobs:
         if: inputs.docker-push == true && inputs.docker-profile != ''
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
-        run: docker-compose -f ${{ inputs.docker-compose-file }} push
+        run: docker-compose --profile ${{ inputs.docker-profile }} -f ${{ inputs.docker-compose-file }} push

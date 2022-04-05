@@ -99,7 +99,12 @@ jobs:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
         run: ${{ inputs.behaviour-test-cmd }}
       - name: Push
-        if: inputs.docker-push == true
+        if: inputs.docker-push == true && inputs.docker-profile == ''
+        env:
+          DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
+        run: docker-compose -f ${{ inputs.docker-compose-file }} push
+      - name: Push (with profile)
+        if: inputs.docker-push == true && inputs.docker-profile != ''
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
         run: docker-compose -f ${{ inputs.docker-compose-file }} push

@@ -10,6 +10,10 @@ on:
         type: boolean
         required: false
         default: false
+      regex-exclude:
+        type: string
+        required: false
+        default: ".*test/.*"
     secrets:
       github-token:
         required: true
@@ -29,3 +33,4 @@ jobs:
           VALIDATE_PHP_PHPSTAN: false
           VALIDATE_PHP_PSALM: false
           IGNORE_GITIGNORED_FILES: true
+          FILTER_REGEX_EXCLUDE: ${{ inputs.regex-exclude }}

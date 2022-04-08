@@ -30,6 +30,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.github-token }}
           DEFAULT_BRANCH: ${{ inputs.default-branch }}
           VALIDATE_ALL_CODEBASE: ${{ inputs.validate-all }}
+          VALIDATE_JSCPD: false
           VALIDATE_PHP_PHPSTAN: false
           VALIDATE_PHP_PSALM: false
           IGNORE_GITIGNORED_FILES: true

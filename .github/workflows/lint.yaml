@@ -30,8 +30,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.github-token }}
           DEFAULT_BRANCH: ${{ inputs.default-branch }}
           VALIDATE_ALL_CODEBASE: ${{ inputs.validate-all }}
+          VALIDATE_ENV: false
           VALIDATE_JSCPD: false
           VALIDATE_PHP_PHPSTAN: false
           VALIDATE_PHP_PSALM: false
+          VALIDATE_TERRAFORM_TFLINT: false
           IGNORE_GITIGNORED_FILES: true
           FILTER_REGEX_EXCLUDE: ${{ inputs.regex-exclude }}

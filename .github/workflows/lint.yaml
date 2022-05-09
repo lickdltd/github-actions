@@ -1,4 +1,4 @@
-name: Build
+name: Lint
 on:
   workflow_call:
     inputs:
@@ -30,6 +30,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.github-token }}
           DEFAULT_BRANCH: ${{ inputs.default-branch }}
           VALIDATE_ALL_CODEBASE: ${{ inputs.validate-all }}
+          VALIDATE_EDITORCONFIG: false
           VALIDATE_ENV: false
           VALIDATE_JSCPD: false
           VALIDATE_PHP_PHPSTAN: false

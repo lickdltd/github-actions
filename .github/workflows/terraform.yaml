@@ -74,9 +74,7 @@ jobs:
         run: terraform validate -no-color
       - name: Refresh
         if: inputs.refresh == true
-        env:
-          TF_VAR_docker_tag: ${{ steps.setup.outputs.git-hash-short }}
-        run: terraform apply -no-color -compact-warnings -auto-approve -input=false -refresh-only
+        run: echo "Terraform refresh step deprecated and is no longer executed"
       - name: Plan
         if: inputs.apply == false
         env:

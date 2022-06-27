@@ -7,4 +7,4 @@ on:
       - published
 jobs:
   docker-release:
-    uses: lickdltd/github-actions/.github/workflows/git-release.yaml@v1
+    uses: lickdltd/github-actions/.github/workflows/git-release.yaml@main

@@ -1,0 +1,10 @@
+---
+
+name: Release
+on:
+  release:
+    types:
+      - published
+jobs:
+  docker-release:
+    uses: lickdltd/github-actions/.github/workflows/git-release.yaml@v1

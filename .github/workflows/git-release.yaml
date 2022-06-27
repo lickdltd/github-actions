@@ -1,0 +1,33 @@
+---
+
+name: Git release
+on:
+  workflow_call: null
+jobs:
+  docker-release:
+    name: Tag and push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Get versions
+        uses: applicreation/versions-action@v1
+        id: versions
+      - name: Delete minor release tags (local)
+        run: git tag -d ${{ steps.versions.outputs.minor }}
+        continue-on-error: true
+      - name: Delete major release tags (local)
+        run: git tag -d ${{ steps.versions.outputs.major }}
+        continue-on-error: true
+      - name: Delete minor release tags (remote)
+        run: git push origin --delete ${{ steps.versions.outputs.minor }}
+        continue-on-error: true
+      - name: Delete major release tags (remote)
+        run: git push origin --delete ${{ steps.versions.outputs.major }}
+        continue-on-error: true
+      - name: Tag minor version
+        run: git tag ${{ steps.versions.outputs.minor }}
+      - name: Tag major version
+        run: git tag ${{ steps.versions.outputs.major }}
+      - name: Push tags
+        run: git push origin --tags

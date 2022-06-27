@@ -6,5 +6,5 @@ on:
     types:
       - published
 jobs:
-  docker-release:
-    uses: lickdltd/github-actions/.github/workflows/git-release.yaml@main
+  git-release:
+    uses: lickdltd/github-actions/.github/workflows/git-release.yaml@v1

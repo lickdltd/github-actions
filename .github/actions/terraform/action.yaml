@@ -1,0 +1,83 @@
+name: Terraform
+description: Terraform
+inputs:
+  aws-region:
+    description: AWS region
+    required: true
+  aws-account-id:
+    description: AWS account ID
+    required: true
+  ssh-private-key:
+    description: SSH private key
+    required: false
+  terraform-version:
+    description: Terraform version
+    required: false
+    default: 1.1.7
+  working-directory:
+    description: Working directory
+    required: true
+  workspace:
+    description: Workspace
+    required: false
+    default: "default"
+  apply:
+    description: Apply?
+    required: false
+    default: "false"
+runs:
+  using: composite
+  steps:
+    - name: Setup
+      id: setup
+      uses: lickdltd/setup-action@v1
+      with:
+        aws-region: ${{ inputs.aws-region }}
+        aws-account-id: ${{ inputs.aws-account-id }}
+        ssh-private-key: ${{ inputs.ssh-private-key }}
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: ${{ inputs.terraform-version }}
+    - name: Format
+      id: fmt
+      shell: sh
+      working-directory: ${{ inputs.working-directory }}
+      run: terraform fmt -check
+    - name: Initialise
+      id: init
+      shell: sh
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        GIT_SSH_COMMAND: "ssh -i ~/.ssh/id_rsa -o UserKnownHostsFile=~/.ssh/known_hosts"
+      run: terraform init -upgrade
+    - name: Create workspace
+      if: inputs.workspace != 'default'
+      shell: sh
+      working-directory: ${{ inputs.working-directory }}
+      run: terraform workspace new ${{ inputs.workspace }} -no-color
+      continue-on-error: true
+    - name: Select workspace
+      if: inputs.workspace != 'default'
+      shell: sh
+      working-directory: ${{ inputs.working-directory }}
+      run: terraform workspace select ${{ inputs.workspace }} -no-color
+    - name: Validate
+      id: validate
+      shell: sh
+      working-directory: ${{ inputs.working-directory }}
+      run: terraform validate -no-color
+    - name: Plan
+      if: inputs.apply != 'true'
+      shell: sh
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        TF_VAR_docker_tag: ${{ steps.setup.outputs.git-hash-short }}
+      run: terraform plan -no-color -compact-warnings -input=false
+    - name: Apply
+      if: inputs.apply == 'true'
+      shell: sh
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        TF_VAR_docker_tag: ${{ steps.setup.outputs.git-hash-short }}
+      run: terraform apply -compact-warnings -auto-approve -input=false

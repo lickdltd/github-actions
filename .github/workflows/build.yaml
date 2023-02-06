@@ -71,6 +71,7 @@ jobs:
         if: inputs.kms-key-name != '' && inputs.kms-encrypted-dir != '' && inputs.kms-decrypted-dir != ''
         run: |
           docker run --rm \
+          -e AWS_REGION=${{inputs.aws-region}} \
           -v ~/.aws:/root/.aws:ro \
           -v ${{ inputs.kms-encrypted-dir }}:/tmp/encrypted \
           -v ${{ inputs.kms-decrypted-dir }}:/tmp/decrypted \

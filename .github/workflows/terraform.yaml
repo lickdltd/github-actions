@@ -55,6 +55,11 @@ jobs:
         with:
           name: ${{ inputs.artifact-name }}
           path: ${{ inputs.artifact-path }}
+      - name: Download all artifacts
+        if: inputs.artifact-name == '' && inputs.artifact-path != ''
+        uses: actions/download-artifact@v3
+        with:
+          path: ${{ inputs.artifact-path }}
       - name: Setup
         id: setup
         uses: lickdltd/setup-action@v1

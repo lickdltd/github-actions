@@ -60,6 +60,9 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: ${{ inputs.artifact-path }}
+      - name: Extract artifacts
+        if: inputs.artifact-path != ''
+        run: find ${{ inputs.artifact-path }} -name '*.tar' -execdir tar -xvf '{}' \;
       - name: Setup
         id: setup
         uses: lickdltd/setup-action@v1

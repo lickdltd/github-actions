@@ -38,6 +38,7 @@ jobs:
           VALIDATE_ALL_CODEBASE: ${{ inputs.validate-all }}
           VALIDATE_EDITORCONFIG: false
           VALIDATE_ENV: false
+          VALIDATE_CHECKOV: false
           VALIDATE_JSCPD: false
           VALIDATE_PHP_PHPSTAN: false
           VALIDATE_PHP_PSALM: false

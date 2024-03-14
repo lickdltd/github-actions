@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Lint
-        uses: github/super-linter@v4.9.6
+        uses: super-linter/super-linter@v6
         env:
           GITHUB_TOKEN: ${{ secrets.github-token }}
           DEFAULT_BRANCH: ${{ inputs.default-branch }}

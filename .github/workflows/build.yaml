@@ -83,12 +83,12 @@ jobs:
         if: inputs.docker-profile == ''
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
-        run: docker-compose -f ${{ inputs.docker-compose-file }} build
+        run: docker compose -f ${{ inputs.docker-compose-file }} build
       - name: Build (with profile)
         if: inputs.docker-profile != ''
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
-        run: docker-compose --profile ${{ inputs.docker-profile }} -f ${{ inputs.docker-compose-file }} build
+        run: docker compose --profile ${{ inputs.docker-profile }} -f ${{ inputs.docker-compose-file }} build
       - name: Tests (unit)
         if: inputs.unit-test-cmd != ''
         env:
@@ -103,9 +103,9 @@ jobs:
         if: inputs.docker-push == true && inputs.docker-profile == ''
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
-        run: docker-compose -f ${{ inputs.docker-compose-file }} push
+        run: docker compose -f ${{ inputs.docker-compose-file }} push
       - name: Push (with profile)
         if: inputs.docker-push == true && inputs.docker-profile != ''
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
-        run: docker-compose --profile ${{ inputs.docker-profile }} -f ${{ inputs.docker-compose-file }} push
+        run: docker compose --profile ${{ inputs.docker-profile }} -f ${{ inputs.docker-compose-file }} push

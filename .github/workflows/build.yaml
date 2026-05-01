@@ -98,24 +98,28 @@ jobs:
         run: docker compose --profile ${{ inputs.docker-profile }} -f ${{ inputs.docker-compose-file }} build
       - name: Build (with GHA cache)
         if: inputs.docker-profile == '' && inputs.docker-cache == true
+        uses: docker/bake-action@v5
+        with:
+          files: ${{ inputs.docker-compose-file }}
+          load: true
+          set: |
+            *.cache-from=type=gha
+            *.cache-to=type=gha,mode=max
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
-        run: |
-          docker buildx bake \
-            -f ${{ inputs.docker-compose-file }} \
-            --load \
-            --set "*.cache-from=type=gha" \
-            --set "*.cache-to=type=gha,mode=max"
+          DOCKER_IMAGE_URL: ${{ inputs.docker-image-url }}
       - name: Build (with profile, with GHA cache)
         if: inputs.docker-profile != '' && inputs.docker-cache == true
+        uses: docker/bake-action@v5
+        with:
+          files: ${{ inputs.docker-compose-file }}
+          load: true
+          set: |
+            *.cache-from=type=gha
+            *.cache-to=type=gha,mode=max
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
-        run: |
-          docker buildx bake \
-            -f ${{ inputs.docker-compose-file }} \
-            --load \
-            --set "*.cache-from=type=gha" \
-            --set "*.cache-to=type=gha,mode=max"
+          DOCKER_IMAGE_URL: ${{ inputs.docker-image-url }}
       - name: Tests (unit)
         if: inputs.unit-test-cmd != ''
         env:

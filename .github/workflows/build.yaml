@@ -35,6 +35,10 @@ on:
         type: boolean
         required: false
         default: false
+      docker-cache:
+        type: boolean
+        required: false
+        default: false
       kms-image-name:
         type: string
         required: false
@@ -79,16 +83,37 @@ jobs:
             --key ${{ inputs.kms-key-name }} \
             --input-dir /tmp/encrypted \
             --output-dir /tmp/decrypted
+      - name: Set up Docker Buildx
+        if: inputs.docker-cache == true
+        uses: docker/setup-buildx-action@v3
       - name: Build
-        if: inputs.docker-profile == ''
+        if: inputs.docker-profile == '' && inputs.docker-cache == false
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
         run: docker compose -f ${{ inputs.docker-compose-file }} build
       - name: Build (with profile)
-        if: inputs.docker-profile != ''
+        if: inputs.docker-profile != '' && inputs.docker-cache == false
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
         run: docker compose --profile ${{ inputs.docker-profile }} -f ${{ inputs.docker-compose-file }} build
+      - name: Build (with GHA cache)
+        if: inputs.docker-profile == '' && inputs.docker-cache == true
+        env:
+          DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
+        run: |
+          docker buildx bake \
+            -f ${{ inputs.docker-compose-file }} \
+            --set "*.cache-from=type=gha" \
+            --set "*.cache-to=type=gha,mode=max"
+      - name: Build (with profile, with GHA cache)
+        if: inputs.docker-profile != '' && inputs.docker-cache == true
+        env:
+          DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
+        run: |
+          docker buildx bake \
+            -f ${{ inputs.docker-compose-file }} \
+            --set "*.cache-from=type=gha" \
+            --set "*.cache-to=type=gha,mode=max"
       - name: Tests (unit)
         if: inputs.unit-test-cmd != ''
         env:

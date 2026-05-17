@@ -87,7 +87,7 @@ jobs:
         if: inputs.docker-cache == true
         uses: docker/setup-buildx-action@v3
       - name: Create Composer auth file
-        run: echo '${{ secrets.ghcr-pat }}' | jq -r '{"github-oauth":{"github.com":.}}' > .composer-auth
+        run: jq -n --arg token '${{ secrets.ghcr-pat }}' '{"github-oauth":{"github.com":$token}}' > .composer-auth
       - name: Build
         if: inputs.docker-profile == '' && inputs.docker-cache == false
         env:

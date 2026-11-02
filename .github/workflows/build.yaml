@@ -43,6 +43,10 @@ on:
         type: string
         required: false
         default: kms
+      docker-targets:
+        type: string
+        required: false
+        default: ''
       unit-test-cmd:
         type: string
         required: false
@@ -92,17 +96,18 @@ jobs:
         if: inputs.docker-profile == '' && inputs.docker-cache == false
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
-        run: docker compose -f ${{ inputs.docker-compose-file }} build
+        run: docker compose -f ${{ inputs.docker-compose-file }} build ${{ inputs.docker-targets }}
       - name: Build (with profile)
         if: inputs.docker-profile != '' && inputs.docker-cache == false
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
-        run: docker compose --profile ${{ inputs.docker-profile }} -f ${{ inputs.docker-compose-file }} build
+        run: docker compose --profile ${{ inputs.docker-profile }} -f ${{ inputs.docker-compose-file }} build ${{ inputs.docker-targets }}
       - name: Build (with GHA cache)
         if: inputs.docker-profile == '' && inputs.docker-cache == true
         uses: docker/bake-action@v5
         with:
           files: ${{ inputs.docker-compose-file }}
+          targets: ${{ inputs.docker-targets }}
           load: true
           set: |
             *.cache-from=type=gha
@@ -115,6 +120,7 @@ jobs:
         uses: docker/bake-action@v5
         with:
           files: ${{ inputs.docker-compose-file }}
+          targets: ${{ inputs.docker-targets }}
           load: true
           set: |
             *.cache-from=type=gha

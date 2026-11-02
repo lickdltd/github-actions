@@ -43,6 +43,15 @@ on:
         type: string
         required: false
         default: kms
+      docker-targets:
+        type: string
+        required: false
+        default: ''
+        description: >-
+          Space-separated list of Compose service names to build and push.
+          When empty (the default) all services are built and pushed.
+          For bake mode (docker-cache: true) only a single target or a
+          newline-separated list is supported by docker/bake-action.
       unit-test-cmd:
         type: string
         required: false
@@ -92,17 +101,20 @@ jobs:
         if: inputs.docker-profile == '' && inputs.docker-cache == false
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
-        run: docker compose -f ${{ inputs.docker-compose-file }} build
+          DOCKER_TARGETS: ${{ inputs.docker-targets }}
+        run: docker compose -f ${{ inputs.docker-compose-file }} build $DOCKER_TARGETS
       - name: Build (with profile)
         if: inputs.docker-profile != '' && inputs.docker-cache == false
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
-        run: docker compose --profile ${{ inputs.docker-profile }} -f ${{ inputs.docker-compose-file }} build
+          DOCKER_TARGETS: ${{ inputs.docker-targets }}
+        run: docker compose --profile ${{ inputs.docker-profile }} -f ${{ inputs.docker-compose-file }} build $DOCKER_TARGETS
       - name: Build (with GHA cache)
         if: inputs.docker-profile == '' && inputs.docker-cache == true
         uses: docker/bake-action@v5
         with:
           files: ${{ inputs.docker-compose-file }}
+          targets: ${{ inputs.docker-targets }}
           load: true
           set: |
             *.cache-from=type=gha
@@ -115,6 +127,7 @@ jobs:
         uses: docker/bake-action@v5
         with:
           files: ${{ inputs.docker-compose-file }}
+          targets: ${{ inputs.docker-targets }}
           load: true
           set: |
             *.cache-from=type=gha
@@ -136,9 +149,11 @@ jobs:
         if: inputs.docker-push == true && inputs.docker-profile == ''
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
-        run: docker compose -f ${{ inputs.docker-compose-file }} push
+          DOCKER_TARGETS: ${{ inputs.docker-targets }}
+        run: docker compose -f ${{ inputs.docker-compose-file }} push $DOCKER_TARGETS
       - name: Push (with profile)
         if: inputs.docker-push == true && inputs.docker-profile != ''
         env:
           DOCKER_TAG: ${{ steps.setup.outputs.git-hash-short }}
-        run: docker compose --profile ${{ inputs.docker-profile }} -f ${{ inputs.docker-compose-file }} push
+          DOCKER_TARGETS: ${{ inputs.docker-targets }}
+        run: docker compose --profile ${{ inputs.docker-profile }} -f ${{ inputs.docker-compose-file }} push $DOCKER_TARGETS
